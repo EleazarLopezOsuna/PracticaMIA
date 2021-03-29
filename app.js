@@ -8,7 +8,7 @@ app.use(bodyParser.json());
 const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'sarata023',
+    password: 'Jared_01',
     database: 'practica_GVE'
 });
 
@@ -98,7 +98,7 @@ app.get('/cargarTemporal', (req, res) => {
     const csv = require('csv-parser');
     const fs = require('fs');
 
-    const path = 'C:\\Users\\jared\\OneDrive\\Escritorio\\practica_mia\\GRAND_VIRUS_EPICENTER.csv';
+    const path = '/home/jared/PracticaMIA/PracticaMIA/GRAND_VIRUS_EPICENTER.csv';
 
     fs.stat(path, (err, stats) => {
         if(err == null){
@@ -263,7 +263,7 @@ app.get('/cargarTemporal', (req, res) => {
                     }
                     
                     //Insertamos los datos en la tabla temporal
-                    sql = `INSERT INTO temporal (nombre_victima,apellido_victima,direccion_victima,`+
+                    sql = `INSERT INTO Temporal (nombre_victima,apellido_victima,direccion_victima,`+
                     `fecha_primera_sospecha,fecha_confirmacion,fecha_muerte,estado_victima,nombre_asociado,`+
                     `apellido_asociado,fecha_conocido,contacto_fisico,fecha_inicio_contacto,fecha_fin_contacto,`+
                     `nombre_hospital,direccion_hospital,ubicacion_victima,fecha_llegada,fecha_retiro,tratamiento,`+
