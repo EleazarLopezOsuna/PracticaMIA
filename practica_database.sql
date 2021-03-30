@@ -71,7 +71,6 @@ CREATE TABLE practica_GVE.Victima (
   nombre VARCHAR(45) NOT NULL,
   apellido VARCHAR(45) NOT NULL,
   direccion VARCHAR(200) NOT NULL,
-  fecha_registro DATETIME NOT NULL,
   fecha_muerte DATETIME NULL,
   ingresado TINYINT(1) NOT NULL,
   PRIMARY KEY (id_victima),
