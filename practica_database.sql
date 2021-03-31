@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS practica_GVE.Tratamiento (
   PRIMARY KEY (id_tratamiento))
 ENGINE = InnoDB;
 
+
 -- -----------------------------------------------------
 -- Table practica_GVE.Asociado
 -- -----------------------------------------------------
