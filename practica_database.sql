@@ -14,7 +14,6 @@ DROP TABLE IF EXISTS  practica_GVE.Localizacion;
 DROP TABLE IF EXISTS  practica_GVE.Asociado;
 DROP TABLE IF EXISTS  practica_GVE.Hospital;
 DROP TABLE IF EXISTS  practica_GVE.Victima;
-DROP TABLE IF EXISTS  practica_GVE.Estatus;
 
 -- -----------------------------------------------------
 -- Table practica_GVE.Tratamiento
@@ -26,18 +25,6 @@ CREATE TABLE IF NOT EXISTS practica_GVE.Tratamiento (
   nombre VARCHAR(200) NOT NULL,
   efectividad INT NOT NULL,
   PRIMARY KEY (id_tratamiento))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table practica_GVE.Estatus
--- -----------------------------------------------------
-DROP TABLE IF EXISTS practica_GVE.Estatus ;
-
-CREATE TABLE IF NOT EXISTS practica_GVE.Estatus (
-  id_estatus INT NOT NULL AUTO_INCREMENT,
-  nombre VARCHAR(45) NOT NULL,
-  PRIMARY KEY (id_estatus))
 ENGINE = InnoDB;
 
 
@@ -86,22 +73,14 @@ DROP TABLE IF EXISTS practica_GVE.Victima ;
 
 CREATE TABLE IF NOT EXISTS practica_GVE.Victima (
   id_victima INT NOT NULL AUTO_INCREMENT,
-  id_estatus INT NOT NULL,
   nombre VARCHAR(45) NOT NULL,
   apellido VARCHAR(45) NOT NULL,
   direccion VARCHAR(200) NOT NULL,
-  fecha_muerte DATETIME NULL DEFAULT NULL,
+  fecha_muerte DATETIME NULL NULL,
+  estatus VARCHAR(200) NOT NULL,
   ingresado TINYINT(1) NOT NULL,
-  PRIMARY KEY (id_victima),
-  INDEX fk_Victima_Estatus1_idx (id_estatus ASC) VISIBLE,
-  CONSTRAINT fk_Victima_Estatus1
-    FOREIGN KEY (id_estatus)
-    REFERENCES practica_GVE.Estatus (id_estatus)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+  PRIMARY KEY (id_victima))
 ENGINE = InnoDB;
-
-
 -- -----------------------------------------------------
 -- Table practica_GVE.Relacion
 -- -----------------------------------------------------
@@ -182,7 +161,7 @@ DROP TABLE IF EXISTS practica_GVE.Ficha_Medica ;
 CREATE TABLE IF NOT EXISTS practica_GVE.Ficha_Medica (
   id_ficha_medica INT NOT NULL AUTO_INCREMENT,
   id_victima INT NOT NULL,
-  id_hospital INT NOT NULL,
+  id_hospital INT,
   fecha_sospecha DATETIME NOT NULL,
   fecha_confirmacion DATETIME NOT NULL,
   PRIMARY KEY (id_ficha_medica),
