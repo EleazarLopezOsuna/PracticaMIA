@@ -9,7 +9,7 @@ const connection = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "Jared_01",
-    database: "practica_GVE",
+    database: "practica_GVE"
 });
 
 //Rutas
@@ -283,7 +283,7 @@ app.get("/cargarTemporal", (req, res) => {
                         if (error) console.log(error);
                     });
                 });
-            res.send("Carga de temporal correcta");
+            res.send("Cargando datos por favor espera 40 minutos :(");
         } else {
             res.send("No se pudo encontrar el archivo");
         }
@@ -291,60 +291,10 @@ app.get("/cargarTemporal", (req, res) => {
 });
 
 app.get("/cargarModelo", (req, res) => {
-    let sql = "SELECT * FROM Temporal WHERE id_temporal = 10;"; //Obtenemos el primer resultado
-    connection.query(sql + ";", (error, result) => {
+    connection.query("call TransformacionHiloCompleto();", (error, result) => {
         if (error) throw error;
-        if (result.length > 0) {
-            if (result[0].nombre_victima == null) {
-                res.send("Sin nombre");
-            } else {
-                //Buscamos el estatus
-                if (result[0].estado_victima != null) {
-                    comprobarIdEstatus(result[0].estado_victima);
-                    sql = `SELECT id_estatus FROM Estatus WHERE nombre = '${result[0].estado_victima}';`;
-                    connection.query(sql, (error, resultadoEstatus) => {
-                        let ingresado = 1;
-                        if (result[0].nombre_hospital == null) ingresado = 0;
-                        let fecha_muerte = null;
-                        if (result[0].fecha_muerte != null) {
-                            fecha_muerte = result[0].fecha_muerte.toISOString().slice(0, 19).replace("T", " ");
-                            fecha_muerte = "'" + fecha_muerte + "'";
-                        }
-                        //fecha_muerte = fecha_muerte.replace(' GMT-0600 (Central Standard Time)', '')
-                        insertarVictima(resultadoEstatus[0].id_estatus, result[0].nombre_victima
-                            , result[0].apellido_victima, result[0].direccion, fecha_muerte, ingresado);
-
-                        if (result[0].nombre_hospital != null)
-                            comprobarHospital(result[0].nombre_hospital, result[0].direccion_hospital);
-
-                        if (result[0].contacto_fisico != null)
-                            comprobarContactoFisico(result[0].contacto_fisico);
-
-                        if (result[0].tratamiento != null)
-                            comprobarTratamiento(result[0].tratamiento, result[0].efectividad);
-
-                        if (result[0].nombre_asociado != null) {
-                            comprobarAsociado(result[0].nombre_asociado, result[0].apellido_asociado);
-                            fecha_conocio = result[0].fecha_conocido.toISOString().slice(0, 19).replace("T", " ");
-                            insertarRelacion(
-                                result[0].nombre_victima, result[0].apellido_victima,
-                                result[0].nombre_asociado, result[0].apellido_asociado,
-                                fecha_conocio
-                            );
-                        }
-                        if (result[0].ubicacion_victima != null) {
-                            let fl = result[0].fecha_llegada.toISOString().slice(0, 19).replace("T", " ");
-                            let fs = result[0].fecha_retiro.toISOString().slice(0, 19).replace("T", " ");
-                            insertarLocalizacion(
-                                result[0].nombre_victima, result[0].apellido_victima, result[0].ubicacion_victima, fl, fs
-                            );
-                        }
-                    });
-                }
-            }
-            res.json(result);
-        }
     });
+    res.send('Insertando datos, por favor espere 30 minutos :(');
 });
 
 //Comprobar conexion
@@ -353,138 +303,3 @@ connection.connect((error) => {
     console.log("Conexion con la base de datos exitosa");
 });
 app.listen(PORT, () => console.log(`Servidor corriendo en el puerto ${PORT}`));
-
-function comprobarIdEstatus(nombre) {
-    sql = `SELECT id_estatus FROM Estatus WHERE nombre = '${nombre}';`;
-    connection.query(sql, (error, resultadoEstatus) => {
-        if (error) throw error;
-        if (resultadoEstatus.length > 0) {
-            //El Estatus Existe
-        } else {
-            //El Estatus no existe, hay que crearlo
-            sql = `INSERT INTO Estatus (nombre) VALUES ('${nombre}');`;
-            connection.query(sql, (error) => {
-                if (error) throw error;
-                comprobarIdEstatus(nombre);
-            });
-        }
-    });
-}
-
-function comprobarHospital(nombre, direccion) {
-    sql = `SELECT * FROM Hospital WHERE nombre = '${nombre}' AND direccion = '${direccion}';`;
-    connection.query(sql, (error, resultadoEstatus) => {
-        if (error) throw error;
-        if (resultadoEstatus.length > 0) {
-            //El Estatus Existe
-        } else {
-            //El Estatus no existe, hay que crearlo
-            sql = `INSERT INTO Hospital (nombre, direccion) VALUES ('${nombre}', '${direccion}');`;
-            connection.query(sql, (error) => {
-                if (error) throw error;
-                comprobarHospital(nombre, direccion);
-            });
-        }
-    });
-}
-
-function comprobarContactoFisico(nombre) {
-    sql = `SELECT * FROM Tipo_Contacto WHERE nombre = '${nombre}';`;
-    connection.query(sql, (error, resultadoEstatus) => {
-        if (error) throw error;
-        if (resultadoEstatus.length > 0) {
-            //El Estatus Existe
-        } else {
-            //El Estatus no existe, hay que crearlo
-            sql = `INSERT INTO Tipo_Contacto (nombre) VALUES ('${nombre}');`;
-            connection.query(sql, (error) => {
-                if (error) throw error;
-                comprobarContactoFisico(nombre);
-            });
-        }
-    });
-}
-
-function comprobarTratamiento(nombre, efectividad) {
-    sql = `SELECT * FROM Tratamiento WHERE nombre = '${nombre}';`;
-    connection.query(sql, (error, resultadoEstatus) => {
-        if (error) throw error;
-        if (resultadoEstatus.length > 0) {
-            //El Estatus Existe
-        } else {
-            //El Estatus no existe, hay que crearlo
-            sql = `INSERT INTO Tratamiento (nombre, efectividad) VALUES ('${nombre}', '${efectividad}');`;
-            connection.query(sql, (error) => {
-                if (error) throw error;
-                comprobarTratamiento(nombre);
-            });
-        }
-    });
-}
-
-function comprobarAsociado(nombre, apellido) {
-    sql = `SELECT * FROM Asociado WHERE nombre = '${nombre}' AND apellido = '${apellido}';`;
-    connection.query(sql, (error, resultadoEstatus) => {
-        if (error) throw error;
-        if (resultadoEstatus.length > 0) {
-            //El Estatus Existe
-        } else {
-            //El Estatus no existe, hay que crearlo
-            sql = `INSERT INTO Asociado (nombre, apellido) VALUES ('${nombre}', '${apellido}');`;
-            connection.query(sql, (error) => {
-                if (error) throw error;
-                comprobarAsociado(nombre, apellido);
-            });
-        }
-    });
-}
-
-function insertarLocalizacion(nombre, apellido, direccion, fecha_l, fecha_s) {
-    sql = `SELECT * FROM Victima WHERE nombre = '${nombre}' AND apellido = '${apellido}';`;
-    connection.query(sql, (error, resultado) => {
-        if (error) throw error;
-        if (resultado.length > 0) {
-            sql =
-                `INSERT INTO Localizacion (id_victima, direccion, fecha_llegada, fecha_salida) VALUES(` +
-                `${resultado[0].id_victima}, '${direccion}', '${fecha_l}', '${fecha_s}')`;
-            connection.query(sql, (error) => {
-                if (error) throw error;
-            });
-        }
-    });
-}
-
-function insertarVictima(e, n, a, d, f, i) {
-    sql = `SELECT * FROM Victima WHERE nombre = '${n}' AND apellido = '${a}';`;
-    connection.query(sql, (error, resultadoEstatus) => {
-        if (error) throw error;
-        if (resultadoEstatus.length > 0) {
-            //El Estatus Existe
-        } else {
-            //El Estatus no existe, hay que crearlo
-            sql =
-        `INSERT INTO Victima (id_estatus, nombre, apellido, direccion, fecha_muerte, ingresado) VALUES (` +
-        `'${e}', '${n}', '${a}','${d}', ${f}, ${i})`;
-            connection.query(sql, (error) => {
-                if (error) throw error;
-                insertarVictima(e, n, a, d, f, i);
-            });
-        }
-    });
-}
-
-function insertarRelacion(nv, av, na, aa, fi) {
-    sql = `SELECT * FROM Victima WHERE nombre = '${nv}' AND apellido = '${av}';`;
-    connection.query(sql, (error, resultado) => {
-        if (error) throw error;
-        sql = `SELECT id_asociado FROM Asociado WHERE nombre = '${na}' AND apellido = '${aa}';`;
-        connection.query(sql, (error, resultado1) => {
-            if (error) throw error;
-            sql = `INSERT INTO Relacion (id_victima, id_asociado, fecha_inicio) VALUES (`
-                + `'${resultado[0].id_victima}', '${resultado1[0].id_asociado}', '${fi}');`;
-            connection.query(sql, (error, r3) => {
-                if (error) throw error;
-            });
-        });
-    });
-}

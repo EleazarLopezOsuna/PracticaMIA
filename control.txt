@@ -1,0 +1,25 @@
+Asociado = 500;
+Contacto = 6584;
+Ficha_Medica = 1000;
+Hospital = 76;
+Localizacion = 943;
+Proceso_Recuperacion = 567;
+Relacion = 4505;
+Tipo_Contacto = 8;
+Tratamiento = 5;
+Victima = 1000;
+
+SELECT COUNT(*) FROM Asociado;
+SELECT COUNT(*) FROM Contacto;
+SELECT COUNT(*) FROM Ficha_Medica;
+SELECT COUNT(*) FROM Hospital;
+SELECT COUNT(*) FROM Localizacion;
+SELECT COUNT(*) FROM Proceso_Recuperacion;
+SELECT COUNT(*) FROM Relacion;
+SELECT COUNT(*) FROM Tipo_Contacto;
+SELECT COUNT(*) FROM Tratamiento;
+SELECT COUNT(*) FROM Victima;
+
+
+Tiempo con los 4 hilos: 12 minutos
+Tiempo con solo 1 hilo: 
