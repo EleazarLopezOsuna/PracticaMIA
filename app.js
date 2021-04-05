@@ -5,12 +5,15 @@ const PORT = process.env.PORT || 1337;
 const app = express();
 app.use(bodyParser.json());
 //Conexion mysql
-const connection = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "Jared_01",
-    database: "practica_GVE"
+
+let connection = mysql.createConnection({
+    user: 'root',
+    password: 'Jared_01',
+    database: 'practica_GVE',
+    socketPath: '/cloudsql/rational-moon-309308:us-central1:msql-test'
 });
+
+
 
 //Rutas
 /*
@@ -47,54 +50,103 @@ const connection = mysql.createConnection({
     cargaModelo. Creacion y carga al modelo
  */
 app.get("/consulta1", (req, res) => {
-    res.send("Consulta 1");
+    const sql = `SELECT Hospital.nombre, Hospital.direccion, COUNT(Victima.nombre) AS Cantidad_Muertos FROM Victima, Ficha_Medica, Hospital WHERE (Victima.fecha_muerte IS NOT NULL OR Victima.estatus = 'Muerte') AND Victima.id_victima = Ficha_Medica.id_victima AND Hospital.id_hospital = Ficha_Medica.id_hospital GROUP BY Hospital.nombre, Hospital.direccion;`;
+    connection.query(sql, (error, result) => {
+        if (error) throw error;
+        res.send(result);
+    });
 });
 
 app.get("/consulta2", (req, res) => {
-    res.send("Consulta 2");
+    const sql = `SELECT Victima.nombre, Victima.apellido, Proceso_Recuperacion.efectividad FROM Victima, Ficha_Medica, Proceso_Recuperacion WHERE Victima.estatus = 'En cuarentena' AND Proceso_Recuperacion.id_ficha_medica = Ficha_Medica.id_ficha_medica AND Ficha_Medica.id_victima = Victima.id_victima AND Victima.estatus = 'En cuarentena' AND Proceso_Recuperacion.id_tratamiento = 2 AND Proceso_Recuperacion.efectividad >= 5;`;
+    connection.query(sql, (error, result) => {
+        if (error) throw error;
+        res.send(result);
+    });
 });
 
 app.get("/consulta3", (req, res) => {
-    res.send("Consulta 3");
+    const sql = `SELECT Victima.nombre, Victima.apellido, Victima.direccion FROM Victima, Relacion, Asociado WHERE (Victima.fecha_muerte IS NOT NULL OR Victima.estatus = 'Muerte') AND Victima.id_victima = Relacion.id_victima AND Asociado.id_asociado = Relacion.id_asociado GROUP BY Victima.nombre, Victima.apellido, Victima.direccion HAVING COUNT(Relacion.id_victima) > 3;`;
+    connection.query(sql, (error, result) => {
+        if (error) throw error;
+        res.send(result);
+    });
 });
 
 app.get("/consulta4", (req, res) => {
-    res.send("Consulta 4");
+    const sql = `SELECT Victima.nombre, Victima.apellido FROM Victima, Contacto, Tipo_Contacto, Asociado, Relacion WHERE Victima.estatus = 'Suspendida' AND Victima.id_victima = Relacion.id_victima AND Asociado.id_asociado = Relacion.id_asociado AND Contacto.id_Relacion = Relacion.id_relacion AND Contacto.id_tipo_contacto = Tipo_Contacto.id_tipo_contacto AND Tipo_Contacto.nombre = 'Beso' GROUP BY Victima.nombre, Victima.apellido HAVING COUNT(Contacto.id_relacion) > 2;`;
+    connection.query(sql, (error, result) => {
+        if (error) throw error;
+        res.send(result);
+    });
 });
 
 app.get("/consulta5", (req, res) => {
-    res.send("Consulta 5");
+    const sql = `SELECT Victima.nombre, Victima.apellido, COUNT(Proceso_Recuperacion.id_ficha_medica) AS Cantidad_Tratamiento FROM Victima, Ficha_Medica, Proceso_Recuperacion, Tratamiento WHERE Victima.id_victima = Ficha_Medica.id_victima AND Ficha_Medica.id_ficha_medica = Proceso_Recuperacion.id_ficha_medica AND Tratamiento.id_tratamiento = Proceso_Recuperacion.id_tratamiento AND Tratamiento.nombre = 'Oxigeno' GROUP BY Victima.nombre, Victima.apellido ORDER BY COUNT(Proceso_Recuperacion.id_ficha_medica) DESC LIMIT 5;`;
+    connection.query(sql, (error, result) => {
+        if (error) throw error;
+        res.send(result);
+    });
 });
 
 app.get("/consulta6", (req, res) => {
-    res.send("Consulta 6");
+    const sql = `SELECT Victima.nombre, Victima.apellido, Victima.fecha_muerte FROM Victima, Localizacion, Ficha_Medica, Proceso_Recuperacion, Tratamiento WHERE (Victima.fecha_muerte IS NOT NULL OR Victima.estatus = 'Muerte') AND Localizacion.id_victima = Victima.id_victima AND Localizacion.direccion = '1987 Delphine Well' AND Victima.id_victima = Ficha_Medica.id_victima AND Ficha_Medica.id_ficha_medica = Proceso_Recuperacion.id_ficha_medica AND Tratamiento.id_tratamiento = Proceso_Recuperacion.id_tratamiento AND Tratamiento.nombre = 'Manejo de la presion arterial';`;
+    connection.query(sql, (error, result) => {
+        if (error) throw error;
+        res.send(result);
+    });
 });
 
 app.get("/consulta7", (req, res) => {
-    res.send("Consulta 7");
+    const sql = `SELECT Victima.nombre, Victima.apellido, Victima.direccion FROM Victima, Ficha_Medica, Proceso_Recuperacion WHERE Victima.id_victima = Ficha_Medica.id_victima AND Ficha_Medica.id_ficha_medica = Proceso_Recuperacion.id_ficha_medica AND Victima.id_victima IN (SELECT Victima.id_victima FROM Victima, Relacion WHERE Victima.id_victima = Relacion.id_victima GROUP BY Victima.id_victima HAVING COUNT(Relacion.id_victima) < 2) GROUP BY Victima.nombre, Victima.apellido, Victima.direccion HAVING COUNT(Proceso_Recuperacion.id_tratamiento) = 2;`;
+    connection.query(sql, (error, result) => {
+        if (error) throw error;
+        res.send(result);
+    });
 });
 
 app.get("/consulta8", (req, res) => {
-    res.send("Consulta 8");
+    const sql = `(SELECT EXTRACT(MONTH FROM Ficha_Medica.fecha_sospecha) AS Mes, Victima.nombre, Victima.apellido, COUNT(Proceso_Recuperacion.id_ficha_medica) AS Tratamientos FROM Victima, Ficha_Medica, Proceso_Recuperacion WHERE Victima.id_victima = Ficha_Medica.id_victima AND Ficha_Medica.id_ficha_medica = Proceso_Recuperacion.id_ficha_medica GROUP BY Ficha_Medica.fecha_sospecha, Victima.nombre, Victima.apellido ORDER BY COUNT(Proceso_Recuperacion.id_ficha_medica) DESC LIMIT 3)
+    UNION 
+    (SELECT EXTRACT(MONTH FROM Ficha_Medica.fecha_sospecha) AS Mes, Victima.nombre, Victima.apellido, COUNT(Proceso_Recuperacion.id_ficha_medica) AS Tratamientos FROM Victima, Ficha_Medica, Proceso_Recuperacion WHERE Victima.id_victima = Ficha_Medica.id_victima AND Ficha_Medica.id_ficha_medica = Proceso_Recuperacion.id_ficha_medica GROUP BY Ficha_Medica.fecha_sospecha, Victima.nombre, Victima.apellido ORDER BY COUNT(Proceso_Recuperacion.id_ficha_medica) ASC LIMIT 3);`;
+    connection.query(sql, (error, result) => {
+        if (error) throw error;
+        res.send(result);
+    });
 });
 
 app.get("/consulta9", (req, res) => {
-    res.send("Consulta 9");
+    const sql = `SELECT Hospital.nombre, (COUNT(Victima.id_victima)*100/(SELECT COUNT(*) FROM Victima WHERE ingresado = 1)) AS Porcentaje_Victimas FROM Victima, Ficha_Medica, Hospital WHERE Victima.id_victima = Ficha_Medica.id_victima AND Hospital.id_hospital = Ficha_Medica.id_hospital GROUP BY Hospital.nombre;`;
+    connection.query(sql, (error, result) => {
+        if (error) throw error;
+        res.send(result);
+    });
 });
 
 app.get("/consulta10", (req, res) => {
-    res.send("Consulta 10");
+    const sql = `SELECT Hospital.nombre AS Hospital, Tipo_Contacto.nombre AS Contacto, COUNT(Tipo_Contacto.nombre) AS Numero FROM Tipo_Contacto, Victima, Contacto, Relacion, Hospital, Ficha_Medica WHERE Victima.id_victima = Relacion.id_victima AND Relacion.id_relacion = Contacto.id_relacion AND Contacto.id_tipo_contacto = Tipo_Contacto.id_tipo_contacto AND Victima.id_victima = Ficha_Medica.id_victima AND Hospital.id_hospital = Ficha_Medica.id_hospital GROUP BY Hospital.nombre, Tipo_Contacto.nombre ORDER BY Hospital.nombre, Numero DESC;`;
+    connection.query(sql, (error, result) => {
+        if (error) throw error;
+        res.send(result);
+    });
 });
 
 app.get("/eliminarTemporal", (req, res) => {
-    res.send("eliminarTemporal");
+    const sql = `TRUNCATE TABLE Temporal;`;
+    connection.query(sql, (error, result) => {
+        if (error) throw error;
+        res.send(result);
+    });
 });
 
 app.get("/eliminarModelo", (req, res) => {
-    res.send("eliminarModelo");
+    connection.query('call EliminarModelo();', (error, result) => {
+        if (error) throw error;
+        res.send(result);
+    });
 });
 
-app.get("/cargarTemporal", (req, res) => {
+app.put("/cargarTemporal", (req, res) => {
     const csv = require("csv-parser");
     const fs = require("fs");
 
@@ -144,6 +196,7 @@ app.get("/cargarTemporal", (req, res) => {
                 }
             });
 
+            const results = [];
             fs.createReadStream(path)
                 .pipe(csv({ separator: ";" }))
                 .on("data", (data) => {
@@ -266,24 +319,29 @@ app.get("/cargarTemporal", (req, res) => {
                             "'" + data.EFECTIVIDAD_EN_VICTIMA + "'";
                     }
 
-                    //Insertamos los datos en la tabla temporal
-                    sql =
-                        `INSERT INTO Temporal (nombre_victima,apellido_victima,direccion_victima,` +
-                        `fecha_primera_sospecha,fecha_confirmacion,fecha_muerte,estado_victima,nombre_asociado,` +
-                        `apellido_asociado,fecha_conocido,contacto_fisico,fecha_inicio_contacto,fecha_fin_contacto,` +
-                        `nombre_hospital,direccion_hospital,ubicacion_victima,fecha_llegada,fecha_retiro,tratamiento,` +
-                        `efectividad,fecha_inicio_tratamiento,fecha_fin_tratamiento,efectivida_en_victima)` +
-                        ` VALUES (${data.NOMBRE_VICTIMA}, ${data.APELLIDO_VICTIMA},${data.DIRECCION_VICTIMA},` +
-                        `${data.FECHA_PRIMERA_SOSPECHA},${data.FECHA_CONFIRMACION},${data.FECHA_MUERTE},${data.ESTADO_VICTIMA},` +
-                        `${data.NOMBRE_ASOCIADO},${data.APELLIDO_ASOCIADO},${data.FECHA_CONOCIO},${data.CONTACTO_FISICO},` +
-                        `${data.FECHA_INICIO_CONTACTO},${data.FECHA_FIN_CONTACTO},${data.NOMBRE_HOSPITAL},${data.DIRECCION_HOSPITAL},` +
-                        `${data.UBICACION_VICTIMA},${data.FECHA_LLEGADA},${data.FECHA_RETIRO},${data.TRATAMIENTO},${data.EFECTIVIDAD},` +
-                        `${data.FECHA_INICIO_TRATAMIENTO},${data.FECHA_FIN_TRATAMIENTO},${data.EFECTIVIDAD_EN_VICTIMA});`;
-                    connection.query(sql, (error, result) => {
-                        if (error) console.log(error);
+                    results.push(data);
+                })
+                .on('end', () => {
+                    results.forEach(data => {
+                        //Insertamos los datos en la tabla temporal
+                        sql =
+                            `INSERT INTO Temporal (nombre_victima,apellido_victima,direccion_victima,` +
+                            `fecha_primera_sospecha,fecha_confirmacion,fecha_muerte,estado_victima,nombre_asociado,` +
+                            `apellido_asociado,fecha_conocido,contacto_fisico,fecha_inicio_contacto,fecha_fin_contacto,` +
+                            `nombre_hospital,direccion_hospital,ubicacion_victima,fecha_llegada,fecha_retiro,tratamiento,` +
+                            `efectividad,fecha_inicio_tratamiento,fecha_fin_tratamiento,efectivida_en_victima)` +
+                            ` VALUES (${data.NOMBRE_VICTIMA}, ${data.APELLIDO_VICTIMA},${data.DIRECCION_VICTIMA},` +
+                            `${data.FECHA_PRIMERA_SOSPECHA},${data.FECHA_CONFIRMACION},${data.FECHA_MUERTE},${data.ESTADO_VICTIMA},` +
+                            `${data.NOMBRE_ASOCIADO},${data.APELLIDO_ASOCIADO},${data.FECHA_CONOCIO},${data.CONTACTO_FISICO},` +
+                            `${data.FECHA_INICIO_CONTACTO},${data.FECHA_FIN_CONTACTO},${data.NOMBRE_HOSPITAL},${data.DIRECCION_HOSPITAL},` +
+                            `${data.UBICACION_VICTIMA},${data.FECHA_LLEGADA},${data.FECHA_RETIRO},${data.TRATAMIENTO},${data.EFECTIVIDAD},` +
+                            `${data.FECHA_INICIO_TRATAMIENTO},${data.FECHA_FIN_TRATAMIENTO},${data.EFECTIVIDAD_EN_VICTIMA});`;
+                        connection.query(sql, (error, result) => {
+                            if (error) console.log(error);
+                        });
                     });
                 });
-            res.send("Cargando datos por favor espera 40 minutos :(");
+            res.send("Cargando datos por favor espera 25 minutos :(");
         } else {
             res.send("No se pudo encontrar el archivo");
         }
@@ -291,10 +349,13 @@ app.get("/cargarTemporal", (req, res) => {
 });
 
 app.get("/cargarModelo", (req, res) => {
+    connection.query("call NuevoModelo();", (error, result) => {
+        if (error) throw error;
+    });
     connection.query("call TransformacionHiloCompleto();", (error, result) => {
         if (error) throw error;
     });
-    res.send('Insertando datos, por favor espere 30 minutos :(');
+    res.send('Insertando datos, por favor espere 2 minutos :(');
 });
 
 //Comprobar conexion

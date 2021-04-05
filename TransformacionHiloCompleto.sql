@@ -26,6 +26,17 @@ SET @fecha_fin_tratamiento = NULL;
 SET @efectividad_en_victima = NULL;
 SET @iterador = 1;
 
+UPDATE Temporal SET fecha_primera_sospecha = NULL WHERE fecha_primera_sospecha =  00000000;
+UPDATE Temporal SET fecha_confirmacion = NULL WHERE fecha_confirmacion =  00000000;
+UPDATE Temporal SET fecha_muerte = NULL WHERE fecha_muerte =  00000000;
+UPDATE Temporal SET fecha_conocido = NULL WHERE fecha_conocido =  00000000;
+UPDATE Temporal SET fecha_inicio_contacto = NULL WHERE fecha_inicio_contacto =  00000000;
+UPDATE Temporal SET fecha_fin_contacto = NULL WHERE fecha_fin_contacto =  00000000;
+UPDATE Temporal SET fecha_llegada = NULL WHERE fecha_llegada =  00000000;
+UPDATE Temporal SET fecha_retiro = NULL WHERE fecha_retiro =  00000000;
+UPDATE Temporal SET fecha_inicio_tratamiento = NULL WHERE fecha_inicio_tratamiento =  00000000;
+UPDATE Temporal SET fecha_fin_tratamiento = NULL WHERE fecha_fin_tratamiento =  00000000;
+
 WHILE @iterador <= 14032 DO
     SELECT @nombre_victima:=nombre_victima, 
         @apellido_victima:=apellido_victima, 

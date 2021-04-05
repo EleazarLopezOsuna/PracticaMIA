@@ -90,20 +90,20 @@ CREATE TABLE IF NOT EXISTS practica_GVE.Relacion (
   id_relacion INT NOT NULL AUTO_INCREMENT,
   id_victima INT NOT NULL,
   id_asociado INT NOT NULL,
-  fecha_inicio DATETIME NOT NULL,
+  fecha_inicio DATETIME,
   PRIMARY KEY (id_relacion),
   INDEX fk_Relacion_Asociado1_idx (id_asociado ASC) VISIBLE,
   INDEX fk_Relacion_Victima1_idx (id_victima ASC) VISIBLE,
   CONSTRAINT fk_Relacion_Asociado1
     FOREIGN KEY (id_asociado)
     REFERENCES practica_GVE.Asociado (id_asociado)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
   CONSTRAINT fk_Relacion_Victima1
     FOREIGN KEY (id_victima)
     REFERENCES practica_GVE.Victima (id_victima)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
@@ -122,13 +122,13 @@ CREATE TABLE IF NOT EXISTS practica_GVE.Contacto (
   CONSTRAINT fk_Contacto_Tipo_Contacto1
     FOREIGN KEY (id_tipo_contacto)
     REFERENCES practica_GVE.Tipo_Contacto (id_tipo_contacto)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
   CONSTRAINT fk_Contacto_Relacion1
     FOREIGN KEY (id_relacion)
     REFERENCES practica_GVE.Relacion (id_relacion)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
@@ -141,15 +141,15 @@ CREATE TABLE IF NOT EXISTS practica_GVE.Localizacion (
   id_localizacion INT NOT NULL AUTO_INCREMENT,
   id_victima INT NOT NULL,
   direccion VARCHAR(200) NOT NULL,
-  fecha_llegada DATETIME NOT NULL,
-  fecha_salida DATETIME NOT NULL,
+  fecha_llegada DATETIME,
+  fecha_salida DATETIME,
   PRIMARY KEY (id_localizacion),
   INDEX fk_Localizacion_Victima1_idx (id_victima ASC) VISIBLE,
   CONSTRAINT fk_Localizacion_Victima1
     FOREIGN KEY (id_victima)
     REFERENCES practica_GVE.Victima (id_victima)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
@@ -162,21 +162,21 @@ CREATE TABLE IF NOT EXISTS practica_GVE.Ficha_Medica (
   id_ficha_medica INT NOT NULL AUTO_INCREMENT,
   id_victima INT NOT NULL,
   id_hospital INT,
-  fecha_sospecha DATETIME NOT NULL,
-  fecha_confirmacion DATETIME NOT NULL,
+  fecha_sospecha DATETIME,
+  fecha_confirmacion DATETIME,
   PRIMARY KEY (id_ficha_medica),
   INDEX fk_Ficha_Medica_Hospital1_idx (id_hospital ASC) VISIBLE,
   INDEX fk_Ficha_Medica_Victima1_idx (id_victima ASC) VISIBLE,
   CONSTRAINT fk_Ficha_Medica_Hospital1
     FOREIGN KEY (id_hospital)
     REFERENCES practica_GVE.Hospital (id_hospital)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
   CONSTRAINT fk_Ficha_Medica_Victima1
     FOREIGN KEY (id_victima)
     REFERENCES practica_GVE.Victima (id_victima)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 
@@ -189,8 +189,8 @@ CREATE TABLE IF NOT EXISTS practica_GVE.Proceso_Recuperacion (
   id_proceso_recuperacion INT NOT NULL AUTO_INCREMENT,
   id_ficha_medica INT NOT NULL,
   id_tratamiento INT NOT NULL,
-  fecha_inicio DATETIME NOT NULL,
-  fecha_fin DATETIME NOT NULL,
+  fecha_inicio DATETIME,
+  fecha_fin DATETIME,
   efectividad INT NOT NULL,
   PRIMARY KEY (id_proceso_recuperacion),
   INDEX fk_Proceso_Recuperacion_Ficha_Medica1_idx (id_ficha_medica ASC) VISIBLE,
@@ -198,11 +198,11 @@ CREATE TABLE IF NOT EXISTS practica_GVE.Proceso_Recuperacion (
   CONSTRAINT fk_Proceso_Recuperacion_Ficha_Medica1
     FOREIGN KEY (id_ficha_medica)
     REFERENCES practica_GVE.Ficha_Medica (id_ficha_medica)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
   CONSTRAINT fk_Proceso_Recuperacion_Tratamiento1
     FOREIGN KEY (id_tratamiento)
     REFERENCES practica_GVE.Tratamiento (id_tratamiento)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;

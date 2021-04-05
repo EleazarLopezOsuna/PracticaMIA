@@ -20,6 +20,14 @@ SELECT COUNT(*) FROM Tipo_Contacto;
 SELECT COUNT(*) FROM Tratamiento;
 SELECT COUNT(*) FROM Victima;
 
+Tiempo con GCloud: 4 minutos
 
-Tiempo con los 4 hilos: 12 minutos
-Tiempo con solo 1 hilo: 
+
+Por si no funciona la conexion a la base de datos
+cambiar el init a rational-moon-309308
+
+gcloud init
+wget https://dl.google.com/cloudsql/cloud_sql_proxy.linux.amd64 -O cloud_sql_proxy
+chmod +x cloud_sql_proxy
+sudo mkdir /cloudsql; sudo chmod 777 /cloudsql
+./cloud_sql_proxy -dir=/cloudsql &
